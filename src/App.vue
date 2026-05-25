@@ -14,12 +14,16 @@ const input = ref(url.value);
 function load() {
   let formatted = input.value.trim();
 
-  if (!formatted.startsWith("http")) {
-    formatted = "http://" + formatted;
+  if (
+    !formatted.startsWith("http://") &&
+    !formatted.startsWith("https://")
+  ) {
+    formatted = "https://" + formatted;
   }
 
   url.value = formatted;
 }
+
 </script>
 
 <template>
