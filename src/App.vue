@@ -1,117 +1,270 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import ipadFrame from './images/ipad-optimised.png'
+import iphoneFrame from './images/iphone-optimised.png'
+import laptopFrame from './images/laptop-screen-optimised.png'
+import desktopFrame from './images/large-screen-optimised.png'
 
-const devices = [
-  { name: "Mobile", width: 375, height: 667 },
-  { name: "Tablet", width: 768, height: 1024 },
-  { name: "Laptop", width: 1280, height: 800 },
-  { name: "Desktop", width: 1440, height: 900 },
-];
+type DeviceId = 'desktop' | 'laptop' | 'tablet' | 'mobile'
 
-const url = ref("http://localhost:5173");
-const input = ref(url.value);
-
-function load() {
-  let formatted = input.value.trim();
-
-  if (
-    !formatted.startsWith("http://") &&
-    !formatted.startsWith("https://")
-  ) {
-    formatted = "https://" + formatted;
-  }
-
-  url.value = formatted;
+interface Device {
+  id: DeviceId
+  name: string
+  width: number
+  height: number
+  frame: string
+  className: string
 }
 
+const devices: Device[] = [
+  {
+    id: 'desktop',
+    name: 'Desktop',
+    width: 1440,
+    height: 900,
+    frame: desktopFrame,
+    className: 'device-desktop',
+  },
+  {
+    id: 'laptop',
+    name: 'Laptop',
+    width: 1280,
+    height: 800,
+    frame: laptopFrame,
+    className: 'device-laptop',
+  },
+  {
+    id: 'tablet',
+    name: 'iPad',
+    width: 768,
+    height: 1024,
+    frame: ipadFrame,
+    className: 'device-tablet',
+  },
+  {
+    id: 'mobile',
+    name: 'iPhone',
+    width: 390,
+    height: 844,
+    frame: iphoneFrame,
+    className: 'device-mobile',
+  },
+]
+
+const inputUrl = ref('https://example.com')
+const pageUrl = ref('https://example.com')
+const hoveredDeviceId = ref<DeviceId | null>(null)
+const selectedDeviceId = ref<DeviceId | null>(null)
+
+const selectedDevice = computed(() =>
+  devices.find((device) => device.id === selectedDeviceId.value) ?? null,
+)
+
+function normalizeUrl(value: string): string {
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return ''
+  }
+
+  return /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`
+}
+
+function loadUrl(): void {
+  pageUrl.value = normalizeUrl(inputUrl.value)
+}
+
+function selectDevice(device: Device): void {
+  selectedDeviceId.value = device.id
+}
+
+function closeFocusedPreview(): void {
+  selectedDeviceId.value = null
+}
+
+function openInNewTab(): void {
+  if (pageUrl.value) {
+    window.open(pageUrl.value, '_blank', 'noopener,noreferrer')
+  }
+}
+
+function handleDeviceKeydown(event: KeyboardEvent, device: Device): void {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    selectDevice(device)
+  }
+}
 </script>
 
 <template>
-  <div class="app">
-    <div class="header">
-      <h1>Breakframe</h1>
+  <main class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Breakframe home">
+        <span class="brand-mark">B</span>
+        <span>breakframe</span>
+      </a>
 
-      <input @keyup.enter="load"
-        v-model="input"
-        placeholder="Enter URL (e.g. http://localhost:5173)"
-      />
+      <span class="header-status">
+        <span class="status-dot"></span>
+        Responsive preview
+      </span>
+    </header>
 
-      <button @click="load">GO</button>
-    </div>
+    <div class="page-content">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Device preview studio</p>
 
-    <div class="grid">
-      <div v-for="device in devices" :key="device.name" class="device">
-        <p>{{ device.name }}</p>
+          <h1>
+            Break the frame.<br />
+            <span>See what fits.</span>
+          </h1>
 
-        <div
-          class="frame"
-          :style="{
-            width: device.width + 'px',
-            height: device.height + 'px',
-          }"
-        >
-          <iframe
-            :src="url"
-            :title="device.name"
-            :width="device.width"
-            :height="device.height"
-          />
+          <p class="hero-copy">
+            Preview your website across every important screen size.
+            Click a device to open a larger view and take your own screenshot.
+          </p>
         </div>
-      </div>
+
+        <div class="hero-note">
+          <span class="command-key">⌘</span>
+          Click any screen to focus it
+        </div>
+      </section>
+
+      <form class="url-bar" @submit.prevent="loadUrl">
+        <label class="url-field">
+          <span>Website URL</span>
+
+          <div class="input-wrap">
+            <span class="input-icon" aria-hidden="true">↗</span>
+
+            <input
+              v-model="inputUrl"
+              type="url"
+              placeholder="https://your-website.com"
+              aria-label="Website URL"
+            />
+          </div>
+        </label>
+
+        <button class="load-button" type="submit">
+          Load preview
+          <span aria-hidden="true">↗</span>
+        </button>
+      </form>
+
+      <section
+        v-if="selectedDevice"
+        class="focused-view"
+        aria-label="Focused device preview"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Focused preview</p>
+
+            <h2>
+              {{ selectedDevice.name }}
+              ·
+              {{ selectedDevice.width }} × {{ selectedDevice.height }}
+            </h2>
+          </div>
+
+          <div class="heading-actions">
+            <button class="outline-button" type="button" @click="openInNewTab">
+              Open in new tab ↗
+            </button>
+
+            <button
+              class="outline-button"
+              type="button"
+              @click="closeFocusedPreview"
+            >
+              View all devices
+            </button>
+          </div>
+        </div>
+
+        <div class="focused-stage">
+          <div
+            class="focused-device"
+            :class="selectedDevice.className"
+          >
+            <iframe
+              :src="pageUrl"
+              :title="`${selectedDevice.name} focused website preview`"
+            ></iframe>
+
+            <img
+              :src="selectedDevice.frame"
+              :alt="`${selectedDevice.name} device frame`"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        v-else
+        class="device-section"
+        aria-label="Device previews"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Device matrix</p>
+            <h2>One page. Every perspective.</h2>
+          </div>
+
+          <span class="section-help">
+            Hover to inspect · Click to focus
+          </span>
+        </div>
+
+        <div class="device-stage">
+          <button
+            v-for="device in devices"
+            :key="device.id"
+            class="device-card"
+            :class="[
+              device.className,
+              {
+                'is-hovered': hoveredDeviceId === device.id,
+                'is-selected': selectedDeviceId === device.id,
+              },
+            ]"
+            type="button"
+            :aria-label="`Open ${device.name} preview, ${device.width} by ${device.height}`"
+            @mouseenter="hoveredDeviceId = device.id"
+            @mouseleave="hoveredDeviceId = null"
+            @focus="hoveredDeviceId = device.id"
+            @blur="hoveredDeviceId = null"
+            @keydown="handleDeviceKeydown($event, device)"
+            @click="selectDevice(device)"
+          >
+            <!-- The iframe must be above the PNG frame. -->
+            <span class="device-preview-window">
+              <iframe
+                :src="pageUrl"
+                :title="`${device.name} website preview`"
+                tabindex="-1"
+              ></iframe>
+            </span>
+
+            <!-- The PNG supplies the bezel and device body. -->
+            <img
+              class="device-frame-image"
+              :src="device.frame"
+              :alt="`${device.name} device frame`"
+            />
+
+            <span class="device-caption">
+              {{ device.name }}
+              {{ device.width }} × {{ device.height }}
+            </span>
+          </button>
+        </div>
+      </section>
     </div>
-  </div>
+  </main>
 </template>
-
-<style scoped>
-.app {
-  background: #0f0f0f;
-  color: white;
-  min-height: 100vh;
-  font-family: sans-serif;
-}
-
-.header {
-  text-align: center;
-  padding: 20px;
-}
-
-input {
-  padding: 10px;
-  width: 300px;
-  margin-right: 10px;
-  border: none;
-  outline: none;
-}
-
-button {
-  padding: 10px 20px;
-  cursor: pointer;
-}
-
-.grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  padding: 20px;
-}
-
-.device {
-  text-align: center;
-}
-
-.frame {
-  border: 2px solid #333;
-  overflow: hidden;
-  background: black;
-}
-
-iframe {
-  border: none;
-}
-
-.frame iframe {
-  transform: scale(0.8);
-  transform-origin: top left;
-}
-</style>
