@@ -401,56 +401,54 @@ h2 {
   z-index: 50;
 }
 
-/* Critical layering:
-   live iframe above the placeholder artwork,
-   device frame PNG below it. */
+/* Frame — the PNG-backed box */
 
-.device-frame-image {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  pointer-events: none;
-  user-select: none;
-}
-
-.device-preview-window {
-  position: absolute;
-  z-index: 3;
+.device-frame {
+  position: relative;
   display: block;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   overflow: hidden;
-  border: 0;
-  border-radius: 2px;
-  background: #fff;
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
-  transition:
-    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 350ms ease;
 }
 
-.device-preview-window iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
+.device-frame iframe {
+  position: absolute;
   border: 0;
-  background: #fff;
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  max-width: none;
+  max-height: none;
+}
+
+/* Grid view: iframes are decorative — clicks focus the card */
+
+.device-card .device-frame iframe {
   pointer-events: none;
 }
 
-.device-card:hover .device-preview-window,
-.device-card:focus-visible .device-preview-window,
-.device-card.is-hovered .device-preview-window {
-  transform: translateY(-3px) scale(1.012);
-  box-shadow:
-    0 13px 30px rgba(0, 0, 0, 0.52),
-    0 0 0 1px rgba(195, 163, 255, 0.65);
+/* Focused view: user can interact with the live site.
+   Note: .focused-device IS the .device-frame, so we target the iframe
+   as a direct descendant of .focused-device. */
+
+.focused-device iframe {
+  pointer-events: auto;
 }
 
-/* Labels */
+/* Calibration outlines */
+
+.is-calibrating {
+  outline: 2px dashed #ff3b30;
+  outline-offset: 0;
+}
+
+.is-calibrating iframe {
+  outline: 2px dashed #0a84ff;
+  outline-offset: 0;
+}
+
+/* Captions */
 
 .device-caption {
   position: absolute;
@@ -465,22 +463,13 @@ h2 {
   pointer-events: none;
 }
 
-/* Desktop */
+/* Grid layout positions */
 
 .device-desktop {
   top: 10px;
   left: 50%;
   z-index: 1;
-  width: 565px;
-  height: 380px;
   transform: translateX(-50%);
-}
-
-.device-desktop .device-preview-window {
-  top: 8.2%;
-  left: 7.2%;
-  width: 85.6%;
-  height: 72%;
 }
 
 .device-desktop:hover,
@@ -490,23 +479,11 @@ h2 {
   transform: translateX(-50%) translateY(-10px) scale(1.035);
 }
 
-/* Laptop */
-
 .device-laptop {
   right: 5%;
   bottom: 34px;
   left: auto;
   z-index: 5;
-  width: 470px;
-  height: 315px;
-  transform: rotate(0deg);
-}
-
-.device-laptop .device-preview-window {
-  top: 8%;
-  left: 8%;
-  width: 84%;
-  height: 67%;
 }
 
 .device-laptop:hover,
@@ -515,48 +492,22 @@ h2 {
   transform: translateY(-13px) scale(1.045);
 }
 
-/* iPad */
-
 .device-tablet {
   bottom: 35px;
   left: 5%;
   z-index: 6;
-  width: 245px;
-  height: 335px;
-  transform: rotate(-1deg);
-}
-
-.device-tablet .device-preview-window {
-  top: 8%;
-  left: 8%;
-  width: 84%;
-  height: 84%;
-  border-radius: 8px;
 }
 
 .device-tablet:hover,
 .device-tablet:focus-visible,
 .device-tablet.is-hovered {
-  transform: translateY(-13px) rotate(-1deg) scale(1.055);
+  transform: translateY(-13px) scale(1.055);
 }
-
-/* iPhone */
 
 .device-mobile {
   bottom: 22px;
   left: 32%;
   z-index: 8;
-  width: 112px;
-  height: 190px;
-  transform: rotate(0deg);
-}
-
-.device-mobile .device-preview-window {
-  top: 5.5%;
-  left: 8%;
-  width: 84%;
-  height: 89%;
-  border-radius: 12px;
 }
 
 .device-mobile:hover,
@@ -611,58 +562,7 @@ h2 {
 }
 
 .focused-device {
-  position: relative;
-  width: min(820px, 100%);
-  aspect-ratio: 1.3;
   filter: drop-shadow(0 35px 60px rgba(0, 0, 0, 0.5));
-}
-
-.focused-device img {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  pointer-events: none;
-}
-
-.focused-device iframe {
-  position: absolute;
-  z-index: 3;
-  top: 8%;
-  left: 7.2%;
-  width: 85.6%;
-  height: 72%;
-  border: 0;
-  background: #fff;
-  pointer-events: auto;
-}
-
-.focused-device.device-tablet {
-  width: min(440px, 78%);
-  aspect-ratio: 0.73;
-}
-
-.focused-device.device-tablet iframe {
-  top: 8%;
-  left: 8%;
-  width: 84%;
-  height: 84%;
-  border-radius: 9px;
-}
-
-.focused-device.device-mobile {
-  width: 280px;
-  aspect-ratio: 0.59;
-}
-
-.focused-device.device-mobile iframe {
-  top: 5.5%;
-  left: 8%;
-  width: 84%;
-  height: 89%;
-  border-radius: 18px;
 }
 
 @keyframes focused-view-in {
@@ -670,7 +570,6 @@ h2 {
     opacity: 0;
     transform: translateY(22px) scale(0.96);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -683,7 +582,6 @@ h2 {
     transform: scale(0.94);
     filter: blur(8px);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
@@ -717,33 +615,6 @@ h2 {
 
   .device-stage {
     height: 560px;
-  }
-
-  .device-desktop {
-    top: 12px;
-    width: 455px;
-    height: 306px;
-  }
-
-  .device-laptop {
-    right: 1%;
-    bottom: 25px;
-    width: 370px;
-    height: 248px;
-  }
-
-  .device-tablet {
-    bottom: 28px;
-    left: 3%;
-    width: 190px;
-    height: 260px;
-  }
-
-  .device-mobile {
-    bottom: 19px;
-    left: 31%;
-    width: 88px;
-    height: 150px;
   }
 
   .focused-stage {
@@ -808,33 +679,6 @@ h2 {
     border-radius: 3px;
   }
 
-  .device-desktop {
-    top: 8px;
-    width: 310px;
-    height: 208px;
-  }
-
-  .device-laptop {
-    right: -4%;
-    bottom: 17px;
-    width: 255px;
-    height: 171px;
-  }
-
-  .device-tablet {
-    bottom: 18px;
-    left: 1%;
-    width: 130px;
-    height: 178px;
-  }
-
-  .device-mobile {
-    bottom: 13px;
-    left: 31%;
-    width: 61px;
-    height: 104px;
-  }
-
   .device-caption {
     bottom: -18px;
     font-size: 7px;
@@ -843,18 +687,6 @@ h2 {
   .focused-stage {
     min-height: 420px;
     padding: 20px 12px;
-  }
-
-  .focused-device {
-    width: 100%;
-  }
-
-  .focused-device.device-tablet {
-    width: 78%;
-  }
-
-  .focused-device.device-mobile {
-    width: 205px;
   }
 
   .heading-actions {
@@ -867,43 +699,143 @@ h2 {
   }
 }
 
-/* Very narrow phones */
+/* Calibration panel */
 
-@media (max-width: 390px) {
-  .page-content {
-    width: calc(100% - 18px);
-  }
+.calib-toggle {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #a875f2, #7541cf);
+  box-shadow: 0 10px 30px rgba(120, 70, 220, 0.45);
+  font-size: 20px;
+  transition: transform 180ms ease;
+}
 
-  .device-stage {
-    height: 330px;
-  }
+.calib-toggle:hover {
+  transform: translateY(-2px) scale(1.05);
+}
 
-  .device-desktop {
-    top: 7px;
-    width: 260px;
-    height: 175px;
-  }
+.calib-panel {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 1001;
+  width: min(320px, calc(100vw - 36px));
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #1a1b20;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  color: #e6dff0;
+  font-size: 12px;
+}
 
-  .device-laptop {
-    right: -10%;
-    bottom: 15px;
-    width: 220px;
-    height: 147px;
-  }
+.calib-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
 
-  .device-tablet {
-    bottom: 15px;
-    left: -1%;
-    width: 112px;
-    height: 153px;
-  }
+.calib-panel header strong {
+  font-size: 13px;
+  color: #fff;
+}
 
-  .device-mobile {
-    bottom: 10px;
-    left: 30%;
-    width: 53px;
-    height: 90px;
-  }
+.calib-panel header button {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.calib-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.calib-tabs button {
+  padding: 6px 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: #b8b0c6;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.calib-tabs button.active {
+  color: #fff;
+  border-color: rgba(195, 163, 255, 0.7);
+  background: rgba(166, 108, 255, 0.18);
+}
+
+.calib-panel label {
+  display: grid;
+  grid-template-columns: 46px 1fr 44px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.calib-panel label > span {
+  color: #b8b0c6;
+  font-weight: 600;
+}
+
+.calib-panel output {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  font-size: 11px;
+}
+
+.calib-panel input[type="range"] {
+  width: 100%;
+  accent-color: var(--purple);
+}
+
+.calib-hint {
+  margin: 10px 0 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(166, 108, 255, 0.1);
+  border: 1px solid rgba(166, 108, 255, 0.25);
+  color: #d5cbe8;
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.calib-copy {
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #a875f2, #7541cf);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  transition: transform 150ms ease;
+}
+
+.calib-copy:hover {
+  transform: translateY(-1px);
 }
 
 /* Accessibility */
