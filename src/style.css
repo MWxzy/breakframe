@@ -543,22 +543,158 @@ h2 {
 }
 
 .focused-stage {
-  position: relative;
-  display: grid;
-  min-height: 600px;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 620px;
+  padding: 40px 24px;
   overflow: hidden;
-  padding: 48px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 6px;
   background:
     radial-gradient(
-      circle at 50% 42%,
-      rgba(126, 72, 211, 0.15),
-      transparent 38%
+      circle at 50% 40%,
+      rgba(126, 77, 214, 0.14),
+      transparent 34%
     ),
-    #17181c;
-  animation: stage-expand 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    #111214;
+}
+
+/*
+  This selector is intentionally specific.
+  The device classes also contain left/right/top/bottom rules
+  for the device matrix, so they must be completely reset here.
+*/
+.focused-stage > .focused-device {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: 0 auto !important;
+  flex: 0 0 auto;
+  transform: none !important;
+  max-width: 100%;
+  filter: drop-shadow(0 28px 44px rgba(0, 0, 0, 0.5));
+}
+
+.focused-stage > .focused-device img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+}
+
+.focused-stage > .focused-device iframe {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  border: 0;
+  background: #100d12;
+}
+
+
+.focused-stage > .focused-device.device-desktop {
+  width: min(82vw, 980px);
+  height: auto;
+  aspect-ratio: 565 / 380;
+}
+
+.focused-stage > .focused-device.device-desktop iframe {
+  top: 8.2%;
+  left: 7.2%;
+  width: 85.6%;
+  height: 72%;
+}
+
+.focused-stage > .focused-device.device-laptop {
+  width: min(82vw, 820px);
+  height: auto;
+  aspect-ratio: 470 / 315;
+}
+
+.focused-stage > .focused-device.device-laptop iframe {
+  top: 7.5%;
+  left: 8%;
+  width: 84%;
+  height: 67%;
+}
+
+.focused-stage > .focused-device.device-tablet {
+  width: min(52vw, 500px);
+  height: auto;
+  aspect-ratio: 245 / 335;
+}
+
+.focused-stage > .focused-device.device-tablet iframe {
+  top: 8%;
+  left: 8%;
+  width: 84%;
+  height: 84%;
+  border-radius: 8px;
+}
+
+
+.focused-stage > .focused-device.device-mobile {
+  width: min(30vw, 280px);
+  height: auto;
+  aspect-ratio: 112 / 190;
+}
+
+.focused-stage > .focused-device.device-mobile iframe {
+  top: 5.8%;
+  left: 8%;
+  width: 84%;
+  height: 89%;
+  border-radius: 12px;
+}
+
+@media (max-width: 700px) {
+  .focused-stage {
+    min-height: 430px;
+    padding: 24px 12px;
+  }
+
+  .focused-stage > .focused-device.device-desktop,
+  .focused-stage > .focused-device.device-laptop {
+    width: min(100%, 680px);
+  }
+
+  .focused-stage > .focused-device.device-tablet {
+    width: min(82vw, 360px);
+  }
+
+  .focused-stage > .focused-device.device-mobile {
+    width: min(62vw, 230px);
+  }
+}
+
+@media (max-width: 430px) {
+  .focused-stage {
+    min-height: 380px;
+    padding: 20px 8px;
+  }
+
+  .focused-stage > .focused-device.device-desktop,
+  .focused-stage > .focused-device.device-laptop {
+    width: 100%;
+  }
+
+  .focused-stage > .focused-device.device-tablet {
+    width: min(88vw, 310px);
+  }
+
+  .focused-stage > .focused-device.device-mobile {
+    width: min(70vw, 220px);
+  }
 }
 
 .focused-device {
